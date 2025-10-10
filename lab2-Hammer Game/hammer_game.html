@@ -14,54 +14,111 @@
 
         let life = 3;                   // The player's life
 
+        // ========== Debugging function
+        let lastTimestamp = Date.now();
+        function _debugTimestamp(name) {
+            const currentTimestamp = Date.now();
+            const timeElapsed = currentTimestamp - lastTimestamp;
+            // console.log(`${name} | Time Elapsed: ${timeElapsed}ms | Timestamp: ${currentTimestamp}`);
+            console.log(`${name} | Time Elapsed: ${timeElapsed}ms`);
+            lastTimestamp = currentTimestamp;
+        }
+
+        const isGameOver = () => { return life <= 0; }
+
         function hideMonster() {
+            _debugTimestamp("hideMonster()");
+
             // Change the life and the colour of the holes
+            if (isGameOver()) return;
+
+            life--;
+            if (life === 2) {
+                $(".hole").css("border-color", "yellow");
+            } else if (life === 1) {
+                $(".hole").css("border-color", "red");
+            }
 
             // If the game is over show the game over screen
-
+            if (life === 0) {
+                $("#gameover").fadeIn();
+                return;
+            }
             // Hide the monster
             $("#monster").hide();
 
-            // Show the monster later again
+            // Show the monster later again (= show after hide time)
+            setTimeout(showMonster, timeToHideMonster);
         }
 
         function showMonster() {
+            _debugTimestamp("showMonster()");
+
             // Find the target div randomly and move the monster
             // to that div
+            const randomIndex = Math.floor(Math.random() * $(".hole").length);
+            const targetHole = $(".hole").eq(randomIndex);
+            $("#monster").appendTo(targetHole);
 
             // Show the monster
             $("#monster").show();
 
-            // Hide the monster later
+            // Hide the monster later (= after show time)
+            hideMonsterTimeout = setTimeout(hideMonster, timeToShowMonster);
         }
 
         function startGame() {
+            _debugTimestamp("startGame()");
             // Hide the countdown timer
+            $("#countdown").fadeOut(500);
 
             // Show the monster the first time
+            setTimeout(showMonster, timeToShowMonster);
 
             // Set up the click handler of the monster
-            // - Clear the previous timeout
-            // - Hide the monster
-            // - Adjust the monster time
-            // - Show the monster later again
+            $("#monster").on("click", function () {
+                if (isGameOver()) return;
+
+                _debugTimestamp("#Monster onClick()!");
+
+                // - Clear the previous timeout
+                clearTimeout(hideMonsterTimeout);
+
+                // - Hide the monster
+                $("#monster").hide();
+
+                // - Adjust the monster time (min time 500ms)
+                timeToShowMonster = Math.max(500, timeToShowMonster - 100);
+                timeToHideMonster = Math.max(500, timeToHideMonster - 100);
+                console.log(`New times: show ${timeToShowMonster}ms, hide ${timeToHideMonster}ms`);
+
+                // timeToShowMonster -= 100;
+                // timeToHideMonster -= 100;
+
+                // - Show the monster later again (= show after hide time)
+                setTimeout(showMonster, timeToHideMonster);
+            });
         }
 
         function countdown() {
+            _debugTimestamp("countdown()");
+
             // Decrease the remaining time
             timeRemaining--;
-            $("#countdown").text(timeRemaining > 0 ? timeRemaining : "Start");
 
-            // Continue the countdown if there is still time;
-            // otherwise, start the game when the time is up
             if (timeRemaining > 0) {
+                // Continue the countdown if there is still time;
+                $("#countdown").text(timeRemaining);
                 setTimeout(countdown, 1000);
             } else {
+                // otherwise, start the game when the time is up
+                $("#countdown").text("Start");
                 startGame();
             }
         }
 
         $(function () {
+            _debugTimestamp("countdown()");
             // Start the countdown screen
             setTimeout(countdown, 1000);
         });
@@ -113,10 +170,29 @@
         }
 
         /* - Set the style of the holes */
-        .hole {}
+        .hole {
+            float: left;
+
+            width: 24vmin;
+            height: 24vmin;
+            margin: 2vmin;
+            background: black;
+
+            box-sizing: border-box;
+            border: 1vmin solid green;
+            border-radius: 10%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
         /* - Set the style of the monster image */
-        #monster {}
+        #monster {
+            width: 80%;
+            height: auto;
+            display: none;
+        }
     </style>
 </head>
 
