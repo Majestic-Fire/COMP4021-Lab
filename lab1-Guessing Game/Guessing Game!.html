@@ -92,6 +92,8 @@
             color: white;
             /* All Uppercase */
             text-transform: uppercase;
+
+            cursor: pointer;
         }
 
         /* Set up the style for the p and big */
@@ -132,7 +134,7 @@
             /* Black Content */
             color: black;
             /* Initially hide the main screen */
-            /* display: none; */
+            display: none;
         }
 
         /* Set up the style for 'button' */
@@ -163,9 +165,9 @@
     </style>
 </head>
 
-<body>
+<body onload="load()">
     <!-- the title screen -->
-    <div class="box" id="title">
+    <div class="box" id="title" onclick="start()">
         <p id="title1">Fantastic</p>
         <p id="title2">Number</p>
         <p id="subtitle">that <big>You Need</big><br>
@@ -175,7 +177,7 @@
     <!-- the game screen -->
     <div class="box" id="main">
         <p>Your Guess: <span id="guess">-</span></p>
-        <a id="button" href="#">Enter Your Guess</a>
+        <a id="button" href="#" onclick="return guess()">Enter Your Guess</a>
         <p id="hint">Press the button to start the guess!</p>
     </div>
 </body>
