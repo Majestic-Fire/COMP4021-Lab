@@ -46,11 +46,17 @@
             } else if (userGuess > answer) {
                 hintElement.innerHTML = "Your number is too big!";
             } else {
-                hintElement.innerHTML = "You are right!";
+                hintElement.innerHTML = "You are right! <br> <button onclick='restartGame()'>Restart Game</button>";
             }
 
             document.getElementById("guess").innerText = userGuess;
             return false;
+        }
+
+        function restartGame() {
+            load(); // Generate a new random number
+            document.getElementById("guess").innerText = "-"; // Reset the guess display
+            document.getElementById("hint").innerHTML = "Press the button to start the guess!"; // Reset the hint
         }
     </script>
     <style>
