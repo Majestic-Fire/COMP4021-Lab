@@ -49,13 +49,21 @@
 
         function countdown() {
             // Decrease the remaining time
+            timeRemaining--;
+            $("#countdown").text(timeRemaining > 0 ? timeRemaining : "Start");
 
             // Continue the countdown if there is still time;
             // otherwise, start the game when the time is up
+            if (timeRemaining > 0) {
+                setTimeout(countdown, 1000);
+            } else {
+                startGame();
+            }
         }
 
         $(function () {
             // Start the countdown screen
+            setTimeout(countdown, 1000);
         });
     </script>
 
