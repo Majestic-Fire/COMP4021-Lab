@@ -28,18 +28,98 @@
         #gameover {
             font-family: Dosis, sans-serif;
         }
+
+        /* Cloud */
+        @keyframes cloud-animation {
+            from {
+                transform: translateX(1000px);
+            }
+
+            to {
+                transform: translateX(-220px);
+            }
+        }
+
+        #cloud {
+            animation-name: cloud-animation;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            animation-duration: 10s;
+        }
+
+        /* Obstacle */
+        @keyframes obstacle-animation {
+            from {
+                transform: translateX(0px);
+            }
+
+            to {
+                transform: translateX(-900px);
+            }
+        }
+
+        #obstacle {
+            display: none;
+            animation-name: obstacle-animation;
+            animation-timing-function: linear;
+            animation-iteration-count: 1;
+            animation-duration: 3s;
+        }
+
+        /* Player jump */
+        @keyframes player-jump {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-100px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        #player {
+            animation-name: none;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: 1;
+            animation-duration: 1s;
+        }
     </style>
     <script>
         // Check whether the game is over if the player is near the obstacle
         function checkGameover() {
-
             // You need to keep on checking for the gameover situation here
+            const player = $("#player");
+            const obstacle = $("#obstacle");
 
             // Read the transform property of the player and obstacle
+            const playerTransform = player.css("transform");
+            const obstacleTransform = obstacle.css("transform");
+            console.log("Player transform:", playerTransform);
+            console.log("Obstacle transform:", obstacleTransform);
 
             // Extract the appropriate numbers
+            const { e: playerX, f: playerY } = new DOMMatrixReadOnly(playerTransform);
+            const { e: obstacleX, f: obstacleY } = new DOMMatrixReadOnly(obstacleTransform);
+            console.log("Player position:", playerX, playerY);
+            console.log("Obstacle position:", obstacleX, obstacleY);
 
             // Compare the numbers for the gameover situation
+            // 1. player near the ground
+            const playerNearGround = playerY > -10; // allow some tolerance
+
+            // 2. obstacle under the player
+            const obstacleUnderPlayer = (obstacleX < -700) && (obstacleX > -800); // allow some tolerance
+            console.log("Player near ground:", playerNearGround);
+            console.log("Obstacle under player:", obstacleUnderPlayer);
+            if (playerNearGround && obstacleUnderPlayer) {
+                // Game over
+                $("#gameover-container").css("display", "inline");
+                return; // Stop checking
+            }
 
             // Request to check again
             setTimeout(checkGameover, 100);
@@ -47,8 +127,10 @@
 
         // Make an obstacle by starting the obstacle animation
         function makeObstacle() {
-
             // You need to show the obstacle and start the animation here
+            $("#obstacle")
+                .css("display", "inline") // or .show()
+                .css("animation-name", "obstacle-animation");
 
         }
 
@@ -56,7 +138,7 @@
         function jump() {
 
             // You need to start the player jumping animation here
-
+            $("#player").css("animation-name", "player-jump");
         }
 
         $(function () {
@@ -69,18 +151,19 @@
 
             // The obstacle animation has finished
             $("#obstacle").on("animationend", function () {
-
                 // You need to hide the obstacle and stop the animation here
+                $(this)
+                    .css("display", "none") // or .hide()
+                    .css("animation-name", "none"); // stop animation, so that we can restart
 
                 // You will make another obstacle later
-
+                setTimeout(makeObstacle, Math.random() * 2000);
             });
 
             // The player animation has finished
             $("#player").on("animationend", function () {
-
                 // You need to stop the animation here
-
+                $(this).css("animation-name", "none");
             });
 
             // Start the obstacle animation
@@ -127,19 +210,17 @@
 
         <!-- The clouds -->
         <g id="clouds">
-            <rect x="200" y="50" width="100" height="50" rx="25" ry="25" fill="white" />
-            <rect x="400" y="80" width="120" height="60" rx="30" ry="30" fill="white" />
-            <rect x="700" y="40" width="150" height="70" rx="35" ry="35" fill="white" />
+            <rect id="cloud" style="animation-delay: -2s;" x="200" y="50" width="100" height="30" rx="25" ry="25"
+                fill="white" />
+            <rect id="cloud" style="animation-delay: -6s;" x="400" y="80" width="120" height="40" rx="30" ry="30"
+                fill="white" />
+            <rect id="cloud" style="animation-delay: -4s;" x="700" y="40" width="150" height="50" rx="35" ry="35"
+                fill="white" />
         </g>
 
         <!-- The player -->
         <g id="player-container">
             <rect id="player" x="100" y="250" width="50" height="50" fill="black" />
-        </g>
-
-        <!-- The hole/flower -->
-        <g id="hole">
-            <ellipse cx="600" cy="350" rx="40" ry="20" fill="url(#hole-gradient)" />
         </g>
 
         <!-- The obstacle -->
@@ -149,7 +230,7 @@
 
         <!-- The game over text -->
         <g id="gameover-container" display="none">
-            <text id="gameover" x="500" y="200" fill="red" font-size="80px" text-anchor="middle">
+            <text id="gameover" x="0" y="0" fill="red" font-size="80px" text-anchor="middle">
                 Game Over
             </text>
         </g>
