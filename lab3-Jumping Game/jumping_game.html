@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Jumping Game</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- This is the font returned from Google font -->
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Style to make the svg fit in the browser */
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+        }
+
+        /* The container moves the text to the middle of the screen */
+        #gameover-container {
+            transform: translate(500px, 200px);
+        }
+
+        #gameover {
+            font-family: Dosis, sans-serif;
+        }
+    </style>
+    <script>
+        // Check whether the game is over if the player is near the obstacle
+        function checkGameover() {
+
+            // You need to keep on checking for the gameover situation here
+
+            // Read the transform property of the player and obstacle
+
+            // Extract the appropriate numbers
+
+            // Compare the numbers for the gameover situation
+
+            // Request to check again
+            setTimeout(checkGameover, 100);
+        }
+
+        // Make an obstacle by starting the obstacle animation
+        function makeObstacle() {
+
+            // You need to show the obstacle and start the animation here
+
+        }
+
+        // Make the player jump by starting the player animation
+        function jump() {
+
+            // You need to start the player jumping animation here
+
+        }
+
+        $(function () {
+            // Handle the spacebar key for controlling the player
+            $(document).on("keydown", function (e) {
+                // The player jumps if the spacebar key is down
+                if (e.keyCode == 32)
+                    jump();
+            });
+
+            // The obstacle animation has finished
+            $("#obstacle").on("animationend", function () {
+
+                // You need to hide the obstacle and stop the animation here
+
+                // You will make another obstacle later
+
+            });
+
+            // The player animation has finished
+            $("#player").on("animationend", function () {
+
+                // You need to stop the animation here
+
+            });
+
+            // Start the obstacle animation
+            setTimeout(makeObstacle, Math.random() * 2000);
+
+            // Start the game over checking
+            setTimeout(checkGameover, 100);
+        });
+    </script>
+</head>
+
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" id="game-svg">
+        <!-- Gradients -->
+        <defs>
+            <!-- Sky gradient -->
+            <linearGradient id="sky-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="lightblue" />
+                <stop offset="100%" stop-color="white" />
+            </linearGradient>
+
+            <!-- Ground gradient -->
+            <linearGradient id="ground-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="lightgreen" />
+                <stop offset="100%" stop-color="green" />
+            </linearGradient>
+
+            <!-- Hole gradient -->
+            <radialGradient id="hole-gradient" cx="50%" cy="50%" r="80%" fx="50%" fy="0%">
+                <stop offset="0%" stop-color="gold" />
+                <stop offset="100%" stop-color="black" />
+            </radialGradient>
+        </defs>
+
+        <!-- The sky -->
+        <g id="sky">
+            <rect x="0" y="0" width="100%" height="100%" fill="url(#sky-gradient)" />
+        </g>
+
+        <!-- The ground -->
+        <g id="ground">
+            <rect x="0" y="300" width="100%" height="100" fill="url(#ground-gradient)" />
+        </g>
+
+        <!-- The clouds -->
+        <g id="clouds">
+            <rect x="200" y="50" width="100" height="50" rx="25" ry="25" fill="white" />
+            <rect x="400" y="80" width="120" height="60" rx="30" ry="30" fill="white" />
+            <rect x="700" y="40" width="150" height="70" rx="35" ry="35" fill="white" />
+        </g>
+
+        <!-- The player -->
+        <g id="player-container">
+            <rect id="player" x="100" y="250" width="50" height="50" fill="black" />
+        </g>
+
+        <!-- The hole/flower -->
+        <g id="hole">
+            <ellipse cx="600" cy="350" rx="40" ry="20" fill="url(#hole-gradient)" />
+        </g>
+
+        <!-- The obstacle -->
+        <g id="obstacle">
+            <rect x="800" y="300" width="50" height="50" fill="red" />
+        </g>
+
+        <!-- The game over text -->
+        <g id="gameover-container" display="none">
+            <text id="gameover" x="500" y="200" fill="red" font-size="80px" text-anchor="middle">
+                Game Over
+            </text>
+        </g>
+    </svg>
+
+
+</html>
