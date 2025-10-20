@@ -129,13 +129,30 @@
             OBSTACLE_Y: 290,         // Obstacle Y position (on ground)
             OBSTACLE_WIDTH: 110,      // Obstacle hitbox width
             OBSTACLE_HEIGHT: 110,    // Obstacle hitbox height
-            COLLISION_THRESHOLD: 30,  // Distance for collision detection
+            COLLISION_THRESHOLD: 20,  // Distance for collision detection
 
             INITIAL_SPEED: 3,        // Initial animation duration in seconds
             SPEED_INCREASE: 0.2,     // Speed increase per successful jump
             CURRENT_SPEED: 3,        // Current animation duration
             OBSTACLES_PASSED: 0      // Count of obstacles successfully passed
         };
+
+        function getNextCheckInterval(playerX, obstacleX) {
+            const distance = Math.abs(playerX - obstacleX);
+
+            // Define check intervals based on distance
+            if (distance <= 50) {
+                return 5;   // Very close - check every 5ms
+            } else if (distance <= 100) {
+                return 10;  // Close - check every 10ms
+            } else if (distance <= 200) {
+                return 25;  // Medium distance - check every 25ms
+            } else if (distance <= 400) {
+                return 50;  // Far - check every 50ms
+            } else {
+                return 100; // Very far - check every 100ms
+            }
+        }
 
         // Check whether the game is over if the player is near the obstacle
         function checkGameover() {
@@ -179,7 +196,7 @@
             }
 
             // Request to check again
-            setTimeout(checkGameover, 100);
+            setTimeout(checkGameover, getNextCheckInterval(actualPlayerX, actualObstacleX));
         }
 
         // Make an obstacle by starting the obstacle animation
