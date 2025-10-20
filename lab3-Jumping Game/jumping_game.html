@@ -139,19 +139,10 @@
 
         function getNextCheckInterval(playerX, obstacleX) {
             const distance = Math.abs(playerX - obstacleX);
-
-            // Define check intervals based on distance
-            if (distance <= 50) {
-                return 5;   // Very close - check every 5ms
-            } else if (distance <= 100) {
-                return 10;  // Close - check every 10ms
-            } else if (distance <= 200) {
-                return 25;  // Medium distance - check every 25ms
-            } else if (distance <= 400) {
-                return 50;  // Far - check every 50ms
-            } else {
-                return 100; // Very far - check every 100ms
-            }
+            if (distance <= 100) return 10;
+            if (distance <= 200) return 25;
+            if (distance <= 400) return 50;
+            return 100;
         }
 
         // Check whether the game is over if the player is near the obstacle
@@ -179,7 +170,6 @@
             const actualPlayerX = GAME_CONFIG.PLAYER_X + playerX;
             const actualPlayerY = GAME_CONFIG.PLAYER_Y + playerY;
             const actualObstacleX = obstacleX;
-            const actualObstacleY = GAME_CONFIG.OBSTACLE_Y + obstacleY;
 
             // Compare the numbers for the gameover situation
             // Check collision (player near ground and obstacle close horizontally)
