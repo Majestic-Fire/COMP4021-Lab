@@ -50,20 +50,22 @@
         /* Obstacle */
         @keyframes obstacle-animation {
             from {
-                transform: translateX(0px);
+                transform: translateX(1000px);
             }
 
             to {
-                transform: translateX(-900px);
+                transform: translateX(-120px);
             }
         }
 
         #obstacle {
             display: none;
-            animation-name: obstacle-animation;
+            /* animation-name: obstacle-animation; */
             animation-timing-function: linear;
             animation-iteration-count: 1;
             animation-duration: 3s;
+
+            /* max-width: 100px; */
         }
 
         /* Player jump */
@@ -84,16 +86,35 @@
         #player {
             animation-name: none;
             animation-timing-function: ease-in-out;
+            /* animation-timing-function: cubic-bezier(1, 100, 0.5, 100); */
             animation-iteration-count: 1;
             animation-duration: 1s;
         }
     </style>
     <script>
+        const GAME_CONFIG = {
+            GROUND_Y: 300,           // Ground level
+            PLAYER_X: 100,           // Player X position
+            PLAYER_Y: 250,           // Player Y position (on ground)
+            PLAYER_WIDTH: 50,        // Player hitbox width
+            PLAYER_HEIGHT: 50,       // Player hitbox height
+            OBSTACLE_X: 0,        // Obstacle X position (on ground)
+            OBSTACLE_Y: 270,         // Obstacle Y position (on ground)
+            OBSTACLE_WIDTH: 80,      // Obstacle hitbox width
+            OBSTACLE_HEIGHT: 120,    // Obstacle hitbox height
+            COLLISION_THRESHOLD: 30  // Distance for collision detection
+        };
+
         // Check whether the game is over if the player is near the obstacle
         function checkGameover() {
             // You need to keep on checking for the gameover situation here
             const player = $("#player");
             const obstacle = $("#obstacle");
+
+            if (obstacle.css("display") === "none") {
+                setTimeout(checkGameover, 100);
+                return;
+            }
 
             // Read the transform property of the player and obstacle
             const playerTransform = player.css("transform");
@@ -102,19 +123,26 @@
             // Extract the appropriate numbers
             const { e: playerX, f: playerY } = new DOMMatrixReadOnly(playerTransform);
             const { e: obstacleX, f: obstacleY } = new DOMMatrixReadOnly(obstacleTransform);
-            console.log("Player position:", playerX, playerY);
-            console.log("Obstacle position:", obstacleX, obstacleY);
+            console.log("Player position:", playerX + GAME_CONFIG.PLAYER_X, playerY + GAME_CONFIG.PLAYER_Y);
+            console.log("Obstacle position:", obstacleX, obstacleY + GAME_CONFIG.OBSTACLE_Y);
+
+            // Calculate actual positions
+            const actualPlayerX = GAME_CONFIG.PLAYER_X + playerX;
+            const actualPlayerY = GAME_CONFIG.PLAYER_Y + playerY;
+            const actualObstacleX = obstacleX;
+            const actualObstacleY = GAME_CONFIG.OBSTACLE_Y + obstacleY;
 
             // Compare the numbers for the gameover situation
-            // 1. player near the ground
-            const playerNearGround = playerY > -10; // allow some tolerance
+            // Check collision (player near ground and obstacle close horizontally)
+            const isPlayerNearGround = actualPlayerY > GAME_CONFIG.PLAYER_Y - 20; // Allow small jump tolerance
+            const isObstacleClose = Math.abs(actualPlayerX - actualObstacleX) < GAME_CONFIG.COLLISION_THRESHOLD;
 
-            // 2. obstacle under the player
-            const obstacleUnderPlayer = (obstacleX < -700) && (obstacleX > -800); // allow some tolerance
-            if (playerNearGround && obstacleUnderPlayer) {
-                // Game over
-                $("#gameover-container").css("display", "inline");
-                return; // Stop checking
+            if (isPlayerNearGround && isObstacleClose) {
+                // Game over!
+                $(".cloud").css("animation-play-state", "paused");
+                $("#obstacle").css("animation-play-state", "paused");
+                $("#gameover-container").show();
+                return;
             }
 
             // Request to check again
@@ -125,19 +153,35 @@
         function makeObstacle() {
             // You need to show the obstacle and start the animation here
             $("#obstacle")
-                .css("display", "inline") // or .show()
+                .show()
                 .css("animation-name", "obstacle-animation");
-
         }
 
         // Make the player jump by starting the player animation
         function jump() {
-
             // You need to start the player jumping animation here
             $("#player").css("animation-name", "player-jump");
         }
 
         $(function () {
+            $("#player").attr({
+                "x": GAME_CONFIG.PLAYER_X,
+                "y": GAME_CONFIG.PLAYER_Y,
+                "width": GAME_CONFIG.PLAYER_WIDTH,
+                "height": GAME_CONFIG.PLAYER_HEIGHT
+            });
+
+            // Position obstacle group using transform
+            $("#obstacle").attr("transform", `translate(${GAME_CONFIG.OBSTACLE_X}, ${GAME_CONFIG.OBSTACLE_Y})`);
+
+
+            $("#obstacle svg").attr({
+                "x": GAME_CONFIG.OBSTACLE_X, // Starting position off-screen
+                "y": GAME_CONFIG.OBSTACLE_Y,
+                "width": GAME_CONFIG.OBSTACLE_WIDTH,
+                "height": GAME_CONFIG.OBSTACLE_HEIGHT,
+            });
+
             // Handle the spacebar key for controlling the player
             $(document).on("keydown", function (e) {
                 // The player jumps if the spacebar key is down
@@ -149,7 +193,7 @@
             $("#obstacle").on("animationend", function () {
                 // You need to hide the obstacle and stop the animation here
                 $(this)
-                    .css("display", "none") // or .hide()
+                    // .css("display", "none") // or .hide()
                     .css("animation-name", "none"); // stop animation, so that we can restart
 
                 // You will make another obstacle later
@@ -205,7 +249,7 @@
         </g>
 
         <!-- The clouds -->
-        <g id="cloud1" id="cloud1" class="cloud" style="animation-delay: 0s;">
+        <g id="cloud1" class="cloud" style="animation-delay: 0s;">
             <path transform="translate(0 30) scale(2) "
                 d="M17,9a4.08,4.08,0,0,0-.93.12,5,5,0,0,0-9,2.09A3,3,0,1,0,6,17H17a4,4,0,0,0,0-8Z"
                 style="fill: white; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
@@ -228,12 +272,55 @@
 
         <!-- The player -->
         <g id="player-container">
-            <rect id="player" x="100" y="250" width="50" height="50" fill="black" />
+            <rect id="player" fill="black" />
         </g>
 
         <!-- The obstacle -->
         <g id="obstacle">
-            <rect x="800" y="300" width="50" height="50" fill="red" />
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 0 512 512" width="80" height="120">
+                <path style=" fill:#29ABE2;" d="M166.247,364.622v-260.08V62.725h183.586v41.817V382.98h-31.618c-10.139,0-18.359-8.22-18.359-18.359
+           s-8.22-18.359-18.359-18.359s-18.359,8.22-18.359,18.359s-8.22,18.359-18.359,18.359s-18.359-8.22-18.359-18.359
+           s-8.22-18.359-18.359-18.359s-18.359,8.22-18.359,18.359H166.247z" />
+                <path
+                    d="M289.657,364.622c0,15.747,12.811,28.558,28.558,28.558h31.618c5.632,0,10.199-4.566,10.199-10.199V62.725
+           c0-5.633-4.567-10.199-10.199-10.199H166.247c-5.632,0-10.199,4.566-10.199,10.199v274.532c-2.587-0.773-5.324-1.194-8.159-1.194
+           c-15.747,0-28.558,12.811-28.558,28.558c0,5.633,4.567,10.199,10.199,10.199c5.632,0,10.199-4.566,10.199-10.199
+           c0-4.499,3.66-8.159,8.159-8.159c4.499,0,8.159,3.66,8.159,8.159c0,5.633,4.567,10.199,10.199,10.199h23.458
+           c5.632,0,10.199-4.566,10.199-10.199c0-4.499,3.66-8.159,8.159-8.159s8.159,3.66,8.159,8.159c0,15.747,12.811,28.558,28.558,28.558
+           s28.558-12.811,28.558-28.558c0-4.499,3.66-8.159,8.159-8.159S289.657,360.122,289.657,364.622z M252.94,364.622
+           c0,4.499-3.66,8.159-8.159,8.159s-8.159-3.66-8.159-8.159c0-15.747-12.811-28.558-28.558-28.558
+           c-12.155,0-22.561,7.634-26.675,18.359h-4.943V72.924h53.036v194.805c0,5.633,4.567,10.199,10.199,10.199
+           c5.632,0,10.199-4.566,10.199-10.199V72.924h54.056v194.805c0,5.633,4.567,10.199,10.199,10.199s10.199-4.566,10.199-10.199V72.924
+           h15.299v299.857h-21.418c-4.499,0-8.159-3.66-8.159-8.159c0-15.747-12.811-28.558-28.558-28.558S252.94,348.874,252.94,364.622z" />
+                <path d="M223.363,402.359c-5.632,0-10.199,4.566-10.199,10.199c0,4.499-3.661,8.159-8.159,8.159c-4.499,0-8.159-3.66-8.159-8.159
+           c0-15.747-12.811-28.558-28.558-28.558s-28.558,12.811-28.558,28.558c0,4.499-3.661,8.159-8.159,8.159
+           c-4.499,0-8.159-3.66-8.159-8.159c0-5.633-4.567-10.199-10.199-10.199s-10.199,4.566-10.199,10.199
+           c0,15.747,12.811,28.558,28.558,28.558c15.747,0,28.558-12.811,28.558-28.558c0-4.499,3.66-8.159,8.159-8.159
+           c4.499,0,8.159,3.66,8.159,8.159c0,15.747,12.811,28.558,28.558,28.558s28.558-12.811,28.558-28.558
+           C233.562,406.925,228.995,402.359,223.363,402.359z" />
+                <path d="M405.928,420.717c-5.632,0-10.199,4.566-10.199,10.199c0,4.499-3.66,8.159-8.159,8.159s-8.159-3.66-8.159-8.159
+           c0-15.747-12.811-28.558-28.558-28.558s-28.558,12.811-28.558,28.558c0,4.499-3.66,8.159-8.159,8.159s-8.159-3.66-8.159-8.159
+           c0-5.633-4.567-10.199-10.199-10.199c-5.632,0-10.199,4.566-10.199,10.199c0,15.747,12.811,28.558,28.558,28.558
+           s28.558-12.811,28.558-28.558c0-4.499,3.66-8.159,8.159-8.159s8.159,3.66,8.159,8.159c0,15.747,12.811,28.558,28.558,28.558
+           s28.558-12.811,28.558-28.558C416.128,425.283,411.56,420.717,405.928,420.717z" />
+                <path d="M201.944,79.044c-5.632,0-10.199,4.566-10.199,10.199v120.351c0,5.633,4.567,10.199,10.199,10.199
+           s10.199-4.566,10.199-10.199V89.243C212.143,83.611,207.576,79.044,201.944,79.044z" />
+                <path d="M277.418,79.044c-5.632,0-10.199,4.566-10.199,10.199v120.351c0,5.633,4.567,10.199,10.199,10.199
+           s10.199-4.566,10.199-10.199V89.243C287.618,83.611,283.05,79.044,277.418,79.044z" />
+                <path d="M201.944,238.151c-5.632,0-10.199,4.566-10.199,10.199v63.235c0,5.633,4.567,10.199,10.199,10.199
+           s10.199-4.566,10.199-10.199v-63.235C212.143,242.718,207.576,238.151,201.944,238.151z" />
+                <path d="M277.418,238.151c-5.632,0-10.199,4.566-10.199,10.199v63.235c0,5.633,4.567,10.199,10.199,10.199
+           s10.199-4.566,10.199-10.199v-63.235C287.618,242.718,283.05,238.151,277.418,238.151z" />
+                <path d="M314.135,331.984c5.632,0,10.199-4.566,10.199-10.199v-16.319c0-5.633-4.567-10.199-10.199-10.199
+           s-10.199,4.566-10.199,10.199v16.319C303.936,327.418,308.503,331.984,314.135,331.984z" />
+                <path d="M239.681,295.267c-5.632,0-10.199,4.566-10.199,10.199v16.319c0,5.633,4.567,10.199,10.199,10.199
+           c5.632,0,10.199-4.566,10.199-10.199v-16.319C249.88,299.833,245.313,295.267,239.681,295.267z" />
+                <path
+                    d="M379.41,356.462c4.499,0,8.159,3.66,8.159,8.159c0,5.633,4.567,10.199,10.199,10.199c5.632,0,10.199-4.566,10.199-10.199
+           c0-15.747-12.811-28.558-28.558-28.558c-5.632,0-10.199,4.566-10.199,10.199C369.211,351.896,373.778,356.462,379.41,356.462z" />
+            </svg>
+
         </g>
 
         <!-- The game over text -->
