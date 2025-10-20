@@ -20,16 +20,43 @@
             height: auto;
         }
 
+        /*======================  GameOver */
         /* The container moves the text to the middle of the screen */
+        @keyframes gameover-spin {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
         #gameover-container {
-            transform: translate(500px, 200px);
+            animation-timing-function: ease-out;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+            transform-origin: center;
+
+            /* transform: translate(500px, 200px); */
+        }
+
+        .gameover-animate {
+            animation-name: gameover-spin;
         }
 
         #gameover {
             font-family: Dosis, sans-serif;
         }
 
-        /* Cloud */
+        /*======================  Cloud */
         @keyframes cloud-animation {
             from {
                 transform: translateX(1000px);
@@ -47,7 +74,7 @@
             animation-duration: 10s;
         }
 
-        /* Obstacle */
+        /* ====================== Obstacle */
         @keyframes obstacle-animation {
             from {
                 transform: translateX(1000px);
@@ -68,7 +95,7 @@
             /* max-width: 100px; */
         }
 
-        /* Player jump */
+        /* ====================== Player jump */
         @keyframes player-jump {
             0% {
                 transform: translateY(0px);
@@ -146,7 +173,8 @@
                 // Game over!
                 $(".cloud").css("animation-play-state", "paused");
                 $("#obstacle").css("animation-play-state", "paused");
-                $("#gameover-container").show();
+                $("#gameover-container").show().addClass("gameover-animate");
+
                 return;
             }
 
@@ -340,7 +368,7 @@
 
         <!-- The game over text -->
         <g id="gameover-container" display="none">
-            <text id="gameover" x="0" y="0" fill="red" font-size="80px" text-anchor="middle">
+            <text id="gameover" x="500" y="200" fill="red" font-size="80px" text-anchor="middle">
                 Game Over
             </text>
         </g>
