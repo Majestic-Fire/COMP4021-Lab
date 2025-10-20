@@ -102,7 +102,12 @@
             OBSTACLE_Y: 290,         // Obstacle Y position (on ground)
             OBSTACLE_WIDTH: 110,      // Obstacle hitbox width
             OBSTACLE_HEIGHT: 110,    // Obstacle hitbox height
-            COLLISION_THRESHOLD: 30  // Distance for collision detection
+            COLLISION_THRESHOLD: 30,  // Distance for collision detection
+
+            INITIAL_SPEED: 3,        // Initial animation duration in seconds
+            SPEED_INCREASE: 0.2,     // Speed increase per successful jump
+            CURRENT_SPEED: 3,        // Current animation duration
+            OBSTACLES_PASSED: 0      // Count of obstacles successfully passed
         };
 
         // Check whether the game is over if the player is near the obstacle
@@ -154,7 +159,10 @@
             // You need to show the obstacle and start the animation here
             $("#obstacle")
                 .show()
-                .css("animation-name", "obstacle-animation");
+                .css({
+                    "animation-name": "obstacle-animation",
+                    "animation-duration": GAME_CONFIG.CURRENT_SPEED + "s"
+                });
         }
 
         // Make the player jump by starting the player animation
@@ -190,6 +198,14 @@
 
             // The obstacle animation has finished
             $("#obstacle").on("animationend", function () {
+                // Increment obstacles passed counter
+                GAME_CONFIG.OBSTACLES_PASSED++;
+
+                // Increase speed (decrease duration)
+                GAME_CONFIG.CURRENT_SPEED = Math.max(1, GAME_CONFIG.INITIAL_SPEED - (GAME_CONFIG.SPEED_INCREASE * GAME_CONFIG.OBSTACLES_PASSED));
+                console.log(`Obstacle ${GAME_CONFIG.OBSTACLES_PASSED} passed! New speed: ${GAME_CONFIG.CURRENT_SPEED}s`);
+
+
                 // You need to hide the obstacle and stop the animation here
                 $(this)
                     .css("display", "none") // or .hide()
