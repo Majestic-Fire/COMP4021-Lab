@@ -99,9 +99,9 @@
             PLAYER_WIDTH: 50,        // Player hitbox width
             PLAYER_HEIGHT: 50,       // Player hitbox height
             OBSTACLE_X: 0,        // Obstacle X position (on ground)
-            OBSTACLE_Y: 270,         // Obstacle Y position (on ground)
-            OBSTACLE_WIDTH: 80,      // Obstacle hitbox width
-            OBSTACLE_HEIGHT: 120,    // Obstacle hitbox height
+            OBSTACLE_Y: 290,         // Obstacle Y position (on ground)
+            OBSTACLE_WIDTH: 110,      // Obstacle hitbox width
+            OBSTACLE_HEIGHT: 110,    // Obstacle hitbox height
             COLLISION_THRESHOLD: 30  // Distance for collision detection
         };
 
@@ -174,7 +174,6 @@
             // Position obstacle group using transform
             $("#obstacle").attr("transform", `translate(${GAME_CONFIG.OBSTACLE_X}, ${GAME_CONFIG.OBSTACLE_Y})`);
 
-
             $("#obstacle svg").attr({
                 "x": GAME_CONFIG.OBSTACLE_X, // Starting position off-screen
                 "y": GAME_CONFIG.OBSTACLE_Y,
@@ -193,7 +192,7 @@
             $("#obstacle").on("animationend", function () {
                 // You need to hide the obstacle and stop the animation here
                 $(this)
-                    // .css("display", "none") // or .hide()
+                    .css("display", "none") // or .hide()
                     .css("animation-name", "none"); // stop animation, so that we can restart
 
                 // You will make another obstacle later
