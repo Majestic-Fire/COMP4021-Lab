@@ -78,6 +78,7 @@
             /* Create the sprites in the game */
             const player = Player(context, 427, 240, gameArea); // The player
             const gem = Gem(context, 427, 350, "green");        // The gem
+            gem.randomize(gameArea);
 
             /* The main processing of the game */
             function doFrame(now) {
@@ -87,7 +88,6 @@
                 const gameTimeSoFar = now - gameStartTime;
                 const timeRemaining = Math.ceil((totalGameTime * 1000 - gameTimeSoFar) / 1000);
                 $("#time-remaining").text(timeRemaining);
-
 
                 /* TODO */
                 /* Handle the game over situation here */
@@ -100,7 +100,9 @@
 
                 /* TODO */
                 /* Randomize the gem and collect the gem here */
-
+                if (gem.getAge(now) > gemMaxAge) {
+                    gem.randomize(gameArea);
+                }
 
                 /* Clear the screen */
                 context.clearRect(0, 0, cv.width, cv.height);
