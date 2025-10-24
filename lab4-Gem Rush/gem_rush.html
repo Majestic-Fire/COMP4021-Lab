@@ -151,11 +151,11 @@
                 $("#game-start").hide();
 
                 const KEYS = {
-                    //arrow keys
                     LEFT: 37,
                     UP: 38,
                     RIGHT: 39,
-                    DOWN: 40
+                    DOWN: 40,
+                    SPACEBAR: 32
                 };
 
                 const DIRECTIONS = {
@@ -182,6 +182,13 @@
                         player.move(direction);
                         event.preventDefault(); // Prevent page scrolling
                     }
+
+                    // Handle spacebar for speed boost
+                    if (event.which === KEYS.SPACEBAR && !pressedKeys.has(event.which)) {
+                        pressedKeys.add(event.which);
+                        player.speedUp();
+                        event.preventDefault();
+                    }
                 });
 
                 /* Handle the keyup of arrow keys and spacebar */
@@ -192,6 +199,12 @@
                         player.stop(direction);
                         // Resume movement for any still-pressed keys
                         resumePressingKey();
+                    }
+
+                    // Handle spacebar release
+                    if (event.which === KEYS.SPACEBAR && pressedKeys.has(event.which)) {
+                        pressedKeys.delete(event.which);
+                        player.slowDown();
                     }
 
                 });
