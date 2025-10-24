@@ -177,10 +177,25 @@ const Sprite = function (ctx, x, y) {
     const update = function (time) {
         if (lastUpdate == 0) lastUpdate = time;
 
+        /* Check if enough time has passed to move to the next frame */
+        if (time - lastUpdate >= sequence.timing) {
+            /* Move to the next sprite frame */
+            index++;
 
-        /* TODO */
-        /* Move to the next sprite when the timing is right */
+            /* Check if we've reached the end of the sequence */
+            if (index >= sequence.count) {
+                if (sequence.loop) {
+                    /* Loop back to the first frame */
+                    index = 0;
+                } else {
+                    /* Stay on the last frame */
+                    index = sequence.count - 1;
+                }
+            }
 
+            /* Update the last update time */
+            lastUpdate = time;
+        }
 
         return this;
     };
