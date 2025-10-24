@@ -67,7 +67,7 @@
                 gameover: new Audio("assets/gameover.mp3")
             };
 
-            const totalGameTime = 20;   // Total game time in seconds
+            const totalGameTime = 5;   // Total game time in seconds
             const gemMaxAge = 9000;     // The maximum age of the gems in milliseconds
             let gameStartTime = 0;      // The timestamp when the game starts
             let collectedGems = 0;      // The number of gems collected in the game
@@ -83,7 +83,10 @@
             /* The main processing of the game */
             function doFrame(now) {
                 if (gameStartTime == 0) gameStartTime = now;
-
+                if (sounds.background.paused) {
+                    sounds.background.loop = true;
+                    sounds.background.play();
+                }
                 /* Update the time remaining */
                 const gameTimeSoFar = now - gameStartTime;
                 const timeRemaining = Math.ceil((totalGameTime * 1000 - gameTimeSoFar) / 1000);
@@ -94,6 +97,8 @@
                 if (timeRemaining <= 0) {
                     $("#game-over").show();
                     $("#final-gems").text(collectedGems);
+                    sounds.background.pause();
+                    sounds.collect.pause();
                     sounds.gameover.play();
                     return;
                 }
