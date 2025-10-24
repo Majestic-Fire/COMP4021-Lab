@@ -118,15 +118,14 @@
                 /* Hide the start screen */
                 $("#game-start").hide();
 
-                /* Key code constants */
                 const KEYS = {
+                    //arrow keys
                     LEFT: 37,
                     UP: 38,
                     RIGHT: 39,
                     DOWN: 40
                 };
 
-                /* Direction constants */
                 const DIRECTIONS = {
                     LEFT: 1,
                     UP: 2,
@@ -134,41 +133,49 @@
                     DOWN: 4
                 };
 
+                const KEY_TO_DIRECTION = {
+                    [KEYS.LEFT]: DIRECTIONS.LEFT,
+                    [KEYS.UP]: DIRECTIONS.UP,
+                    [KEYS.RIGHT]: DIRECTIONS.RIGHT,
+                    [KEYS.DOWN]: DIRECTIONS.DOWN
+                };
+
+                const pressedKeys = new Set();
+
                 /* Handle the keydown of arrow keys and spacebar */
                 $(document).on("keydown", function (event) {
-                    switch (event.which) {
-                        case KEYS.LEFT:
-                            player.move(DIRECTIONS.LEFT);
-                            break;
-                        case KEYS.UP:
-                            player.move(DIRECTIONS.UP);
-                            break;
-                        case KEYS.RIGHT:
-                            player.move(DIRECTIONS.RIGHT);
-                            break;
-                        case KEYS.DOWN:
-                            player.move(DIRECTIONS.DOWN);
-                            break;
+                    const direction = KEY_TO_DIRECTION[event.which];
+                    if (direction && !pressedKeys.has(event.which)) {
+                        pressedKeys.add(event.which);
+                        player.move(direction);
+                        event.preventDefault(); // Prevent page scrolling
                     }
                 });
 
                 /* Handle the keyup of arrow keys and spacebar */
                 $(document).on("keyup", function (event) {
-                    switch (event.which) {
-                        case KEYS.LEFT:
-                            player.stop(DIRECTIONS.LEFT);
-                            break;
-                        case KEYS.UP:
-                            player.stop(DIRECTIONS.UP);
-                            break;
-                        case KEYS.RIGHT:
-                            player.stop(DIRECTIONS.RIGHT);
-                            break;
-                        case KEYS.DOWN:
-                            player.stop(DIRECTIONS.DOWN);
-                            break;
+                    const direction = KEY_TO_DIRECTION[event.which];
+                    if (direction && pressedKeys.has(event.which)) {
+                        pressedKeys.delete(event.which);
+                        player.stop(direction);
+                        // Resume movement for any still-pressed keys
+                        resumePressingKey();
                     }
+
                 });
+
+                function resumePressingKey() {
+                    // Find the most recently pressed key that's still active
+                    const activeKeys = Array.from(pressedKeys);
+                    if (activeKeys.length > 0) {
+                        // Use the last pressed key (most recent)
+                        const lastKey = activeKeys[activeKeys.length - 1];
+                        const direction = KEY_TO_DIRECTION[lastKey];
+                        if (direction) {
+                            player.move(direction);
+                        }
+                    }
+                }
 
                 /* Start the game */
                 requestAnimationFrame(doFrame);
