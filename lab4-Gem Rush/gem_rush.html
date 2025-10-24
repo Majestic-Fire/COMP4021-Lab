@@ -118,24 +118,56 @@
                 /* Hide the start screen */
                 $("#game-start").hide();
 
+                /* Key code constants */
+                const KEYS = {
+                    LEFT: 37,
+                    UP: 38,
+                    RIGHT: 39,
+                    DOWN: 40
+                };
+
+                /* Direction constants */
+                const DIRECTIONS = {
+                    LEFT: 1,
+                    UP: 2,
+                    RIGHT: 3,
+                    DOWN: 4
+                };
+
                 /* Handle the keydown of arrow keys and spacebar */
                 $(document).on("keydown", function (event) {
-
-
-                    /* TODO */
-                    /* Handle the key down */
-
-
+                    switch (event.which) {
+                        case KEYS.LEFT:
+                            player.move(DIRECTIONS.LEFT);
+                            break;
+                        case KEYS.UP:
+                            player.move(DIRECTIONS.UP);
+                            break;
+                        case KEYS.RIGHT:
+                            player.move(DIRECTIONS.RIGHT);
+                            break;
+                        case KEYS.DOWN:
+                            player.move(DIRECTIONS.DOWN);
+                            break;
+                    }
                 });
 
                 /* Handle the keyup of arrow keys and spacebar */
                 $(document).on("keyup", function (event) {
-
-
-                    /* TODO */
-                    /* Handle the key up */
-
-
+                    switch (event.which) {
+                        case KEYS.LEFT:
+                            player.stop(DIRECTIONS.LEFT);
+                            break;
+                        case KEYS.UP:
+                            player.stop(DIRECTIONS.UP);
+                            break;
+                        case KEYS.RIGHT:
+                            player.stop(DIRECTIONS.RIGHT);
+                            break;
+                        case KEYS.DOWN:
+                            player.stop(DIRECTIONS.DOWN);
+                            break;
+                    }
                 });
 
                 /* Start the game */
