@@ -54,6 +54,7 @@
     <script src="js/sprite.js"></script>
     <script src="js/player.js"></script>
     <script src="js/gem.js"></script>
+    <script src="js/fire.js"></script>
     <script>
         $(function () {
             /* Get the canvas and 2D context */
@@ -67,8 +68,8 @@
                 gameover: new Audio("assets/gameover.mp3")
             };
 
-            const totalGameTime = 5;   // Total game time in seconds
-            const gemMaxAge = 9000;     // The maximum age of the gems in milliseconds
+            const totalGameTime = 20;   // Total game time in seconds
+            const gemMaxAge = 3000;     // The maximum age of the gems in milliseconds
             let gameStartTime = 0;      // The timestamp when the game starts
             let collectedGems = 0;      // The number of gems collected in the game
 
@@ -79,6 +80,9 @@
             const player = Player(context, 427, 240, gameArea); // The player
             const gem = Gem(context, 427, 350, "green");        // The gem
             gem.randomize(gameArea);
+            const fires = Object.values(gameArea.getPoints()).map(([x, y]) =>
+                Fire(context, x, y)
+            );
 
             /* The main processing of the game */
             function doFrame(now) {
@@ -106,6 +110,7 @@
                 /* Update the sprites */
                 gem.update(now);
                 player.update(now);
+                fires.forEach(fire => fire.update(now));
 
 
                 /* TODO */
@@ -134,6 +139,7 @@
                 /* Draw the sprites */
                 gem.draw();
                 player.draw();
+                fires.forEach(fire => fire.draw());
 
                 /* Process the next frame */
                 requestAnimationFrame(doFrame);
