@@ -136,16 +136,27 @@ const Sprite = function (ctx, x, y) {
         /* Get the display size of the sprite */
         const size = getDisplaySize();
 
-
         // console.log(JSON.stringify(sequence));
 
-        /* TODO */
-        /* Replace the following code to draw the sprite correctly */
-        ctx.fillStyle = "red";
-        ctx.globalAlpha = 0.6;
-        ctx.fillRect(parseInt(x - size.width / 2), parseInt(y - size.height / 2),
-            size.width, size.height);
+        /* Disable image smoothing for crisp pixel art */
+        ctx.imageSmoothingEnabled = false;
 
+        /* Calculate destination position and round to whole pixels to avoid blur */
+        const destX = Math.round(x - size.width / 2);
+        const destY = Math.round(y - size.height / 2);
+
+        /* Draw the sprite at the correct position with proper scaling */
+        ctx.drawImage(
+            sheet,
+            sequence.x + (index * sequence.width),  // Source x (accounting for animation frame)
+            sequence.y,                             // Source y
+            sequence.width,                         // Source width
+            sequence.height,                        // Source height
+            destX,                                  // Destination x (rounded to avoid blur)
+            destY,                                  // Destination y (rounded to avoid blur)
+            size.width,                             // Destination width (scaled)
+            size.height                             // Destination height (scaled)
+        );
 
         /* Restore saved settings */
         ctx.restore();
