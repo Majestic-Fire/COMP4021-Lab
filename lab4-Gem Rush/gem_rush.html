@@ -91,7 +91,12 @@
 
                 /* TODO */
                 /* Handle the game over situation here */
-
+                if (timeRemaining <= 0) {
+                    $("#game-over").show();
+                    $("#final-gems").text(collectedGems);
+                    sounds.gameover.play();
+                    return;
+                }
 
                 /* Update the sprites */
                 gem.update(now);
@@ -107,7 +112,8 @@
                 // 2. Point In Box Method
                 if (player.getBoundingBox().isPointInBox(...Object.values(gem.getXY()))) {
                     collectedGems++;
-                    sounds.collect.play(); // Play collect sound
+                    sounds.collect.currentTime = 0;
+                    sounds.collect.play();
                     gem.randomize(gameArea); // Move gem to new location
                     // $("#gems-collected").text(collectedGems); // Update UI (if you have this element)
                     console.log("Gems collected: " + collectedGems);
