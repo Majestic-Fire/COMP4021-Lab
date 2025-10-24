@@ -68,7 +68,7 @@
             };
 
             const totalGameTime = 20;   // Total game time in seconds
-            const gemMaxAge = 3000;     // The maximum age of the gems in milliseconds
+            const gemMaxAge = 9000;     // The maximum age of the gems in milliseconds
             let gameStartTime = 0;      // The timestamp when the game starts
             let collectedGems = 0;      // The number of gems collected in the game
 
@@ -100,6 +100,19 @@
 
                 /* TODO */
                 /* Randomize the gem and collect the gem here */
+
+                // 1. Bouding Box Intersect Method
+                // if (player.getBoundingBox().intersect(gem.getBoundingBox())) {
+
+                // 2. Point In Box Method
+                if (player.getBoundingBox().isPointInBox(...Object.values(gem.getXY()))) {
+                    collectedGems++;
+                    sounds.collect.play(); // Play collect sound
+                    gem.randomize(gameArea); // Move gem to new location
+                    // $("#gems-collected").text(collectedGems); // Update UI (if you have this element)
+                    console.log("Gems collected: " + collectedGems);
+                }
+
                 if (gem.getAge(now) > gemMaxAge) {
                     gem.randomize(gameArea);
                 }
