@@ -112,22 +112,33 @@ app.post("/signin", (req, res) => {
     // G. Sending a success response with the user account
     //
     const { avatar, name } = users[username];
+    req.session.user = { username, avatar, name };
     res.json({ status: "success", user: { username, avatar, name } });
 });
 
 // Handle the /validate endpoint
 app.get("/validate", (req, res) => {
 
+    // req.sessionStore.all((err, sessions) => {
+    //     if (err) {
+    //         console.error("Error fetching all sessions:", err);
+    //     } else {
+    //         console.log("All sessions:", sessions);
+    //     }
+    // });
+
     //
     // B. Getting req.session.user
     //
+    const user = req.session.user;
+    if (!user) {
+        return res.json({ status: "error", error: "No active session." });
+    }
 
     //
     // D. Sending a success response with the user account
     //
-
-    // Delete when appropriate
-    res.json({ status: "error", error: "This endpoint is not yet implemented." });
+    res.json({ status: "success", user: user });
 });
 
 // Handle the /signout endpoint

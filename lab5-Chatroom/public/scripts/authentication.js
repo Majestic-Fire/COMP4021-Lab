@@ -65,17 +65,33 @@ const Authentication = (function () {
         //
         // A. Sending the AJAX request to the server
         //
+        fetch("/validate", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.status === "error") {
+                    //
+                    // C. Processing any error returned by the server
+                    //
+                    if (onError) onError(json.error);
+                    return;
+                }
+                else if (json.status === "success") {
+                    //
+                    // E. Handling the success response from the server
+                    //
+                    user = json.user;
+                    if (onSuccess) onSuccess();
+                }
 
-        //
-        // C. Processing any error returned by the server
-        //
-
-        //
-        // E. Handling the success response from the server
-        //
-
-        // Delete when appropriate
-        if (onError) onError("This function is not yet implemented.");
+            })
+            .catch((err) => {
+                if (onError) onError("Failed to fetch: " + err.message);
+            });
     };
 
     // This function sends a sign-out request to the server
