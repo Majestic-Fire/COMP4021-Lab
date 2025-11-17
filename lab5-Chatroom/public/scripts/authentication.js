@@ -1,9 +1,9 @@
-const Authentication = (function() {
+const Authentication = (function () {
     // This stores the current signed-in user
     let user = null;
 
     // This function gets the signed-in user
-    const getUser = function() {
+    const getUser = function () {
         return user;
     }
 
@@ -14,26 +14,45 @@ const Authentication = (function() {
     //                 request is successful in this form `onSuccess()`
     // * `onError`   - This is a callback function to be called when the
     //                 request fails in this form `onError(error)`
-    const signin = function(username, password, onSuccess, onError) {
+    const signin = function (username, password, onSuccess, onError) {
 
         //
         // A. Preparing the user data
         //
- 
+        const data = JSON.stringify({ username, password });
+
         //
         // B. Sending the AJAX request to the server
         //
+        fetch("/signin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: data,
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.status === "error") {
+                    //
+                    // F. Processing any error returned by the server
+                    //
+                    if (onError) onError(json.error);
+                    return;
+                }
+                else if (json.status === "success") {
+                    //
+                    // H. Handling the success response from the server
+                    //
+                    user = json.user;
+                    if (onSuccess) onSuccess();
+                }
 
-        //
-        // F. Processing any error returned by the server
-        //
 
-        //
-        // H. Handling the success response from the server
-        //
-
-        // Delete when appropriate
-        if (onError) onError("This function is not yet implemented.");
+            })
+            .catch((err) => {
+                if (onError) onError("Failed to fetch: " + err.message);
+            });
     };
 
     // This function sends a validate request to the server
@@ -41,7 +60,7 @@ const Authentication = (function() {
     //                 request is successful in this form `onSuccess()`
     // * `onError`   - This is a callback function to be called when the
     //                 request fails in this form `onError(error)`
-    const validate = function(onSuccess, onError) {
+    const validate = function (onSuccess, onError) {
 
         //
         // A. Sending the AJAX request to the server
@@ -64,7 +83,7 @@ const Authentication = (function() {
     //                 request is successful in this form `onSuccess()`
     // * `onError`   - This is a callback function to be called when the
     //                 request fails in this form `onError(error)`
-    const signout = function(onSuccess, onError) {
+    const signout = function (onSuccess, onError) {
 
         // Delete when appropriate
         if (onError) onError("This function is not yet implemented.");

@@ -28,6 +28,17 @@ function containWordCharsOnly(text) {
     return /^\w+$/.test(text);
 }
 
+function readUsersFromFile() {
+    const usersFilePath = "./data/users.json";
+    const usersFile = fs.readFileSync(usersFilePath, "utf8");
+    return JSON.parse(usersFile);
+}
+
+function writeUsersToFile(users) {
+    const usersFilePath = "./data/users.json";
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+}
+
 // Handle the /register endpoint
 app.post("/register", (req, res) => {
     // C. Get the JSON data from the body
@@ -36,9 +47,7 @@ app.post("/register", (req, res) => {
     //
     // D. Reading the users.json file
     //
-    const usersFilePath = "./data/users.json";
-    const usersFile = fs.readFileSync(usersFilePath, "utf8");
-    const users = JSON.parse(usersFile);
+    const users = readUsersFromFile();
     //
     // E. Checking for the user data correctness
     //
@@ -70,7 +79,7 @@ app.post("/register", (req, res) => {
         name: name,
         password: hashPassword
     };
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+    writeUsersToFile(users);
 
     //
     // I. Sending a success response to the browser
@@ -86,17 +95,24 @@ app.post("/signin", (req, res) => {
     //
     // D. Reading the users.json file
     //
+    const users = readUsersFromFile();
 
     //
     // E. Checking for username/password
     //
+    if (!(username in users)) {
+        return res.json({ status: "error", error: "Username does not exist." });
+    }
+
+    if (!bcrypt.compareSync(password, users[username].password)) {
+        return res.json({ status: "error", error: "Incorrect password." });
+    }
 
     //
     // G. Sending a success response with the user account
     //
-
-    // Delete when appropriate
-    res.json({ status: "error", error: "This endpoint is not yet implemented." });
+    const { avatar, name } = users[username];
+    res.json({ status: "success", user: { username, avatar, name } });
 });
 
 // Handle the /validate endpoint
