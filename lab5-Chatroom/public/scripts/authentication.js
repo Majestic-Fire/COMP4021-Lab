@@ -100,9 +100,30 @@ const Authentication = (function () {
     // * `onError`   - This is a callback function to be called when the
     //                 request fails in this form `onError(error)`
     const signout = function (onSuccess, onError) {
+        fetch("/signout", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.status === "error") {
+                    // Processing any error returned by the server
+                    if (onError) onError(json.error);
+                    return;
+                }
+                else if (json.status === "success") {
+                    // Handling the success response from the server
+                    user = null;
+                    if (onSuccess) onSuccess();
+                }
 
-        // Delete when appropriate
-        if (onError) onError("This function is not yet implemented.");
+            })
+            .catch((err) => {
+                if (onError) onError("Failed to fetch: " + err.message);
+            });
+
     };
 
     return { getUser, signin, validate, signout };

@@ -147,13 +147,12 @@ app.get("/signout", (req, res) => {
     //
     // Deleting req.session.user
     //
+    req.session.destroy();
 
     //
     // Sending a success response
     //
-
-    // Delete when appropriate
-    res.json({ status: "error", error: "This endpoint is not yet implemented." });
+    res.json({ status: "success" });
 });
 
 
