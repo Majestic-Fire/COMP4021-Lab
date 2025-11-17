@@ -34,6 +34,9 @@ jobs:
           # Create a directory for deployment
           mkdir -p gh-pages
 
+          # Copy the main index.html for COMP4021-LAB
+          cp index.html gh-pages/
+
           # Define an array of labs and their main HTML files
           declare -A labs=(
             ["lab1-Guessing Game"]="Guessing Game!.html"
