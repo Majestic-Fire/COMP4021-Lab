@@ -30,31 +30,52 @@ function containWordCharsOnly(text) {
 
 // Handle the /register endpoint
 app.post("/register", (req, res) => {
-    // Get the JSON data from the body
+    // C. Get the JSON data from the body
     const { username, avatar, name, password } = req.body;
 
     //
     // D. Reading the users.json file
     //
-
+    const usersFilePath = "./data/users.json";
+    const usersFile = fs.readFileSync(usersFilePath, "utf8");
+    const users = JSON.parse(usersFile);
     //
     // E. Checking for the user data correctness
     //
+    // Check if all required fields are not empty
+    if (!username || !avatar || !name || !password) {
+        return res.json({ status: "error", error: "All fields (username, avatar, name, password) are required." });
+    }
+
+    // Check if username contains only valid characters (letters, numbers, underscores)
+    if (!containWordCharsOnly(username)) {
+        return res.json({ status: "error", error: "Invalid username format." });
+    }
+
+    // Check if username already exists
+    if (username in users) {
+        return res.json({ status: "error", error: "Username already exists." });
+    }
 
     //
     // G. Adding the new user account
     //
+    const hashPassword = bcrypt.hashSync(password, 10);
 
     //
     // H. Saving the users.json file
     //
+    users[username] = {
+        avatar: avatar,
+        name: name,
+        password: hashPassword
+    };
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
 
     //
     // I. Sending a success response to the browser
     //
-
-    // Delete when appropriate
-    res.json({ status: "error", error: "This endpoint is not yet implemented." });
+    res.json({ status: "success", user: { username, avatar, name } });
 });
 
 // Handle the /signin endpoint
@@ -73,7 +94,7 @@ app.post("/signin", (req, res) => {
     //
     // G. Sending a success response with the user account
     //
- 
+
     // Delete when appropriate
     res.json({ status: "error", error: "This endpoint is not yet implemented." });
 });
@@ -88,7 +109,7 @@ app.get("/validate", (req, res) => {
     //
     // D. Sending a success response with the user account
     //
- 
+
     // Delete when appropriate
     res.json({ status: "error", error: "This endpoint is not yet implemented." });
 });
@@ -103,7 +124,7 @@ app.get("/signout", (req, res) => {
     //
     // Sending a success response
     //
- 
+
     // Delete when appropriate
     res.json({ status: "error", error: "This endpoint is not yet implemented." });
 });
