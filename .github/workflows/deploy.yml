@@ -1,0 +1,70 @@
+name: Deploy Labs to Pages
+
+on:
+  # Trigger deployment on push to the main branch
+  push:
+    branches: [main]
+  # Allow manual workflow dispatch
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+    #   - name: Setup Node.js
+    #     uses: actions/setup-node@v4
+    #     with:
+    #       node-version: 18
+
+      - name: Build Labs
+        run: |
+          # Create a directory for deployment
+          mkdir -p gh-pages
+
+          # Copy each lab's static files to its respective subdirectory and rename the main HTML file to index.html
+          mkdir -p gh-pages/lab1
+          cp -r "lab1-Guessing Game/"* gh-pages/lab1/
+          mv gh-pages/lab1/Guessing Game!.html gh-pages/lab1/index.html
+
+          mkdir -p gh-pages/lab2
+          cp -r "lab2-Hammer Game/"* gh-pages/lab2/
+          mv gh-pages/lab2/hammer_game.html gh-pages/lab2/index.html
+
+          mkdir -p gh-pages/lab3
+          cp -r "lab3-Jumping Game/"* gh-pages/lab3/
+          mv gh-pages/lab3/jumping_game.html gh-pages/lab3/index.html
+
+          mkdir -p gh-pages/lab4
+          cp -r "lab4-Gem Rush/"* gh-pages/lab4/
+          mv gh-pages/lab4/gem_rush.html gh-pages/lab4/index.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: gh-pages
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
